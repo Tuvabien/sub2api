@@ -1,0 +1,37 @@
+# start-dev.ps1 - 一键启动 sub2api 开发环境
+# 用法：在项目根目录执行 .\start-dev.ps1
+
+$ErrorActionPreference = "Stop"
+
+# 启动后端（新窗口）
+$startBackend = {
+    Set-Location "d:\working\AI\sub2api\backend"
+    $env:GOTOOLCHAIN="auto"
+    $env:SKIP_SETUP="true"
+    $env:DATABASE_HOST="127.0.0.1"
+    $env:DATABASE_USER="postgres"
+    $env:DATABASE_PASSWORD="123456"
+    $env:DATABASE_DBNAME="sub2api"
+    $env:DATABASE_SSLMODE="disable"
+    $env:REDIS_HOST="127.0.0.1"
+    $env:SERVER_MODE="debug"
+    $env:SERVER_HOST="0.0.0.0"
+    $env:SERVER_PORT="8080"
+    $env:JWT_SECRET="f48fbcd28277b27b444ff6c3967542c00276e8ef7c4e41716e"
+    $env:TOTP_ENCRYPTION_KEY="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    $env:LOG_OUTPUT_TO_FILE="false"
+    $env:LOG_OUTPUT_TO_STDOUT="true"
+    $env:TZ="Asia/Shanghai"
+    go run ./cmd/server/
+}
+Start-Process powershell -ArgumentList "-NoExit", "-Command", $startBackend.ToString()
+
+# 启动前端（新窗口）
+$startFrontend = {
+    Set-Location "d:\working\AI\sub2api\frontend"
+    node node_modules/vite/bin/vite.js
+}
+Start-Process powershell -ArgumentList "-NoExit", "-Command", $startFrontend.ToString()
+
+Write-Host "前端: http://localhost:3000"
+Write-Host "后端: http://localhost:8080"
